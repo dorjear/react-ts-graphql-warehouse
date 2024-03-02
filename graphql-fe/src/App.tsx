@@ -8,6 +8,7 @@ import { Uoms } from "./components/Uoms";
 import { Warehouses } from "./components/Warehouses";
 import { Products } from "./components/Products";
 import { SupplierProducts } from "./components/SupplierProducts";
+import { Transactions } from "./components/Transactions";
 
 function App() {
     return (
@@ -21,6 +22,7 @@ function App() {
                 <Route path="/warehouses" element={<Warehouses />} />
                 <Route path="/products" element={<Products />} />
                 <Route path="/supplier-products" element={<SupplierProducts />} />
+                <Route path="/transactions" element={<Transactions />} />
             </Routes>
         </BrowserRouter>
     );

@@ -1,59 +1,20 @@
 import { useState } from "react";
 import { ModalDialog } from "./ModalDialog";
-import { useQuery, useMutation, gql } from "@apollo/client";
+import { NotFoundError } from "../NotFoundError";
+
+import {
+  useGetCategoriesQuery,
+  CategoryPatch,
+  useAddCategoryMutation,
+  useDeleteCategoryMutation,
+  useUpdateCategoryMutation,
+  GetCategoriesDocument
+} from "../generated/graphql";
 
 const entityName = "Category";
 
-const GET_ALL = gql`
- query GetCategories {
-   allCategories {
-     nodes {
-       nodeId
-       id
-       description
-     }
-   }
- }
-`;
-
-const ADD_ENTITY = gql`
- mutation AddCategory($description: String!) {
-   createCategory(input: { category: { description: $description } }) {
-     category {
-       nodeId
-     }
-   }
- }
-`;
-
-const DELETE_ENTITY = gql`
- mutation DeleteCategory($nodeId: ID!) {
-   deleteCategory(input: { nodeId: $nodeId }) {
-     deletedCategoryId
-   }
- }
-`;
-
-const UPDATE_ENTITY = gql`
- mutation UpdateCategory($nodeId: ID!, $description: String!) {
-   updateCategory(
-     input: { nodeId: $nodeId, categoryPatch: { description: $description } }
-   ) {
-     category {
-       nodeId
-     }
-   }
- }
-`;
-
-interface AllEntity {
-  allCategories: { nodes: Entity[] };
-}
-
-interface Entity {
+interface Entity extends CategoryPatch {
   nodeId?: string;
-  id?: number;
-  description?: string;
 }
 
 export const Categories = (props: {}) => {
@@ -62,25 +23,21 @@ export const Categories = (props: {}) => {
 
   // Usage of the the Apollo Client's useQuery & useMutation to interact with
   // our GraphQL API
-  const { loading, error, data } = useQuery<AllEntity>(GET_ALL);
-  const [addEntity, { error: errorAdding }] = useMutation(ADD_ENTITY, {
-    refetchQueries: [{ query: GET_ALL }]
+  const { loading, error, data } = useGetCategoriesQuery();
+
+  const [addEntity, { error: errorAdding }] = useAddCategoryMutation({
+    refetchQueries: [{ query: GetCategoriesDocument }]
   });
-  const [deleteEntity, { error: errorDeleting }] = useMutation(DELETE_ENTITY, {
-    refetchQueries: [{ query: GET_ALL }]
+  const [deleteEntity, { error: errorDeleting }] = useDeleteCategoryMutation({
+    refetchQueries: [{ query: GetCategoriesDocument }]
   });
-  const [updateEntity, { error: errorUpdating }] = useMutation(UPDATE_ENTITY, {
-    refetchQueries: [{ query: GET_ALL }]
+  const [updateEntity, { error: errorUpdating }] = useUpdateCategoryMutation({
+    refetchQueries: [{ query: GetCategoriesDocument }]
   });
 
   if (loading) return <span>Loading...</span>;
   if (error || errorAdding || errorDeleting || errorUpdating) {
-    const message =
-        error?.message ||
-        errorAdding?.message ||
-        errorDeleting?.message ||
-        errorUpdating?.message;
-    return <span>{`Error: ${message}`}</span>;
+    throw new NotFoundError();
   }
   if (!data) return <span>No records found.</span>;
 

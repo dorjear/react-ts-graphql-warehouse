@@ -24,6 +24,9 @@ export const Dashboard = () => {
             <Link className="underline" to="/supplier-products">
                 Supplier Products
             </Link>
+            <Link className="underline" to="/transactions">
+                Transactions
+            </Link>
         </div>
     );
 };
