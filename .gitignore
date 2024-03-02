@@ -1,1 +1,4 @@
 /.idea/
+/graphql-fe/package-lock.json
+/graphql-fe/graphql.schema.json
+/graphql-fe/src/generated/
